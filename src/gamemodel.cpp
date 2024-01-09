@@ -1,5 +1,7 @@
 #include <algorithm>
 #include <raylib.h>
+#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/node/parse.h>
 #include "brick.hpp"
 #include "gamemodel.hpp"
 
@@ -9,7 +11,8 @@ namespace Arcpp {
     ball { platform }
   {
     LevelLoader ll;
-    current_level = ll.load_level(path_to_levels, level_name);
+    YAML::Node levels = YAML::LoadFile(path_to_levels);
+    current_level = ll.load_level(levels, level_name);
     m_settings = Settings::instance();
   }
 

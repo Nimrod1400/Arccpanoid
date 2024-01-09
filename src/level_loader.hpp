@@ -21,6 +21,6 @@ namespace Arcpp {
     Vector2 m_adjust_coordinates(const Vector2 &position);
 
   public:
-    Level load_level(const std::string &file_path, const std::string &level_name);
+    Level load_level(const YAML::Node &levels, const std::string &level_name);
   };
 }

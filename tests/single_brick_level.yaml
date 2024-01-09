@@ -1,0 +1,12 @@
+---
+single_brick:
+  width: 1
+  height: 1
+  player_health: 1
+  bricks:
+    - position:
+        x: 0
+        y: 0
+      health: 1
+      bonus_type: 0
+...

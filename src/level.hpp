@@ -9,7 +9,7 @@
 namespace Arcpp {
   class Level {
   public:
-    std::string m_level_name;
+    std::string level_name;
     Vector2 bricks_amounts;
     std::vector<Brick> bricks;
     int max_player_health;

@@ -3,10 +3,11 @@
 #include "level_loader.hpp"
 
 namespace Arcpp {
-  Level LevelLoader::load_level(const std::string &file_path, const std::string &level_name) {
+  Level LevelLoader::load_level(const YAML::Node &node, const std::string &level_name) {
     Level lg;
-    YAML::Node file_node = YAML::LoadFile(file_path);
-    YAML::Node level_node = file_node[level_name];
+    lg.level_name = level_name;
+
+    YAML::Node level_node = node[level_name];
 
     m_parse_bricks_amount(lg, level_node);
     m_parse_player_health(lg, level_node);
