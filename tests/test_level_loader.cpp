@@ -1,4 +1,3 @@
-#include <boost/test/tools/old/interface.hpp>
 #define BOOST_TEST_MAIN
 #define BOOST_TEST_DYN_LINK
 
@@ -6,6 +5,8 @@
 #include <yaml-cpp/node/node.h>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
+#include <boost/test/tools/old/interface.hpp>
+#include <utility>
 
 BOOST_AUTO_TEST_SUITE(TestLevelLoaderFacade)
 
@@ -54,6 +55,71 @@ BOOST_AUTO_TEST_CASE(LoadFourBricksLevel) {
   BOOST_REQUIRE_EQUAL(level.bricks.size(), bricks_amount);
   for (int i = 0; i < bricks_healths.size(); ++i)
     BOOST_REQUIRE_EQUAL(level.bricks[i].health, bricks_healths[i]);
+}
+
+BOOST_AUTO_TEST_CASE(SpacerCalculation) {
+  std::string level_name = "single_brick";
+
+  Vector2 screen_params = { 1920, 1080 };
+  float expected = std::sqrt(std::pow(screen_params.x, 2.0f) + std::pow(screen_params.y, 2.0f)) / 200.0f;
+
+  YAML::Node level_node = YAML::LoadFile("./tests/single_brick_level.yaml");
+
+  Arcpp::LevelLoader ll;
+  ll.load_level(level_node, level_name);
+
+  BOOST_REQUIRE_EQUAL(ll.calculate_spacer(screen_params), expected);
+}
+
+BOOST_AUTO_TEST_CASE(SingleBrickAdjustment) {
+  Vector2 brick_pos = { 0, 0 };
+  
+  std::string level_name = "single_brick";
+  
+  YAML::Node level_node = YAML::LoadFile("./tests/single_brick_level.yaml");
+  
+  Arcpp::LevelLoader ll;
+  Arcpp::Level level = ll.load_level(level_node, level_name); 
+
+  Vector2 expected_coordinates = 
+  {
+    (brick_pos.x + 1) * ll.spacer + brick_pos.x * ll.brick_size.x,
+    (brick_pos.y + 1) * ll.spacer + brick_pos.y * ll.brick_size.y,  
+  }; 
+ 
+  BOOST_REQUIRE_EQUAL(level.bricks[0].hitbox.x, expected_coordinates.x);
+  BOOST_REQUIRE_EQUAL(level.bricks[0].hitbox.y, expected_coordinates.y);
+}
+
+BOOST_AUTO_TEST_CASE(FourBricksAdjustment) {
+  std::vector<Vector2> bricks_pos = 
+  { 
+    { 0, 0 },
+    { 1, 0 },
+    { 2, 0 },
+    { 3, 0 }, 
+  };
+  
+  std::string level_name = "four_bricks";
+  
+  YAML::Node level_node = YAML::LoadFile("./tests/four_bricks_level.yaml");
+  
+  Arcpp::LevelLoader ll;
+  Arcpp::Level level = ll.load_level(level_node, level_name); 
+
+  std::vector<Vector2> expected_coords;
+
+  for (int i = 0; i < bricks_pos.size(); ++i) 
+    expected_coords.push_back(
+    std::move<Vector2>({
+      (bricks_pos[i].x + 1) * ll.spacer + bricks_pos[i].x * ll.brick_size.x,
+      (bricks_pos[i].y + 1) * ll.spacer + bricks_pos[i].y * ll.brick_size.y,  
+    }));
+      
+  for (int i = 0; i < bricks_pos.size(); ++i) {
+    BOOST_REQUIRE_EQUAL(level.bricks[i].hitbox.x, expected_coords[i].x);
+    BOOST_REQUIRE_EQUAL(level.bricks[i].hitbox.y, expected_coords[i].y);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

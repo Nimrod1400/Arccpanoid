@@ -16,17 +16,29 @@ namespace Arcpp {
     return lg;
   }
 
+  Vector2 LevelLoader::adjust_coordinates(const Vector2 &position) {
+    Vector2 res;
+    res.x = (position.x + 1) * spacer + position.x * brick_size.x;
+    res.y = (position.y + 1) * spacer + position.y * brick_size.y;
+
+    return res;
+  }
+
+  float LevelLoader::calculate_spacer(Vector2 screen_params) {
+    return std::sqrt(std::pow(screen_params.x, 2.0f) + std::pow(screen_params.y, 2.0f)) / 200.0f;
+  }
+
   void LevelLoader::m_parse_bricks_amount(Level &level, const YAML::Node &node) {
     level.bricks_amounts.x = node["width"].as<float>();
     level.bricks_amounts.y = node["height"].as<float>();
-    m_bricks_amount = level.bricks_amounts;
+    bricks_amount = level.bricks_amounts;
 
-    m_spacer = m_settings->screen_width / 150.0f;
-    float additional_space_x = m_spacer * (level.bricks_amounts.x + 1);
-    float additional_space_y = m_spacer * level.bricks_amounts.y;
+    spacer = calculate_spacer({ float(m_settings->screen_width), float(m_settings->screen_height) });
+    float additional_space_x = spacer * (level.bricks_amounts.x + 1);
+    float additional_space_y = spacer * level.bricks_amounts.y;
 
-    this->m_brick_size.x = (m_settings->screen_width - additional_space_x) / level.bricks_amounts.x;
-    this->m_brick_size.y = (m_settings->screen_height / 3.0f - additional_space_y) / level.bricks_amounts.y;
+    this->brick_size.x = (m_settings->screen_width - additional_space_x) / level.bricks_amounts.x;
+    this->brick_size.y = (m_settings->screen_height / 3.0f - additional_space_y) / level.bricks_amounts.y;
   }
 
   void LevelLoader::m_parse_player_health(Level &level, const YAML::Node &node) {
@@ -44,9 +56,9 @@ namespace Arcpp {
 
   Brick LevelLoader::m_parse_brick(const YAML::Node &node) {
     Vector2 position { node["position"]["x"].as<float>(), node["position"]["y"].as<float>() };
-    Vector2 coordinates = m_adjust_coordinates(position);
+    Vector2 coordinates = adjust_coordinates(position);
 
-    Rectangle hitbox { coordinates.x, coordinates.y, m_brick_size.x, m_brick_size.y };
+    Rectangle hitbox { coordinates.x, coordinates.y, brick_size.x, brick_size.y };
 
     int health = node["health"].as<int>();
     BonusType bonus_type = static_cast<BonusType>(node["bonus_type"].as<int>());
@@ -54,13 +66,5 @@ namespace Arcpp {
     Brick b { health, bonus_type, hitbox };
 
     return b;
-  }
-
-  Vector2 LevelLoader::m_adjust_coordinates(const Vector2 &position) {
-    Vector2 res;
-    res.x = (position.x + 1) * m_spacer + position.x * m_brick_size.x;
-    res.y = (position.y + 1) * m_spacer + position.y * m_brick_size.y;
-
-    return res;
   }
 }

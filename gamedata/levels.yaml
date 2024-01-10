@@ -240,5 +240,28 @@ level2:
       health: 4
       bonus_type: 0
 level3:
-
+  width: 4
+  height: 1
+  player_health: 5
+  bricks:
+    - position:
+        x: 0
+        y: 0
+      health: 1
+      bonus_type: 0
+    - position:
+        x: 1
+        y: 0
+      health: 3
+      bonus_type: 1
+    - position:
+        x: 2
+        y: 0
+      health: 3
+      bonus_type: 1
+    - position:
+        x: 3
+        y: 0
+      health: 1
+      bonus_type: 0
 ...
